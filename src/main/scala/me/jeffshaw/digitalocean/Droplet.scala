@@ -379,7 +379,7 @@ object Droplet
     userData: Option[String]
   )(implicit client: DigitalOceanClient,
     ec: ExecutionContext
-  ): Future[DropletCreation] = {
+  ): Future[DropletBatchCreation] = {
     createBatch(names, region, size, image.id, sshKeys, backups, ipv6, privateNetworking, userData)
   }
 
@@ -395,7 +395,7 @@ object Droplet
     userData: Option[String]
   )(implicit client: DigitalOceanClient,
     ec: ExecutionContext
-  ): Future[DropletCreation] = {
+  ): Future[DropletBatchCreation] = {
     val imagePart = "image" -> image
     createBatchAux(names, region, size, imagePart, sshKeys, backups, ipv6, privateNetworking, userData)
   }
@@ -412,7 +412,7 @@ object Droplet
     userData: Option[String]
   )(implicit client: DigitalOceanClient,
     ec: ExecutionContext
-  ): Future[DropletCreation] = {
+  ): Future[DropletBatchCreation] = {
     val imagePart = "image" -> image
     createBatchAux(names, region, size, imagePart, sshKeys, backups, ipv6, privateNetworking, userData)
   }
@@ -429,7 +429,7 @@ object Droplet
     userData: Option[String]
   )(implicit client: DigitalOceanClient,
     ec: ExecutionContext
-  ): Future[DropletCreation] = {
+  ): Future[DropletBatchCreation] = {
     val nonImageParts =
       ("names" -> names) ~
         ("region" -> region.slug) ~
@@ -443,7 +443,7 @@ object Droplet
     val requestJson = nonImageParts.merge(imagePart)
 
     for {
-      response <- client.post[responses.DropletCreation](path, requestJson)
+      response <- client.post[responses.DropletBatchCreation](path, requestJson)
       droplet <- response.toDropletCreation
     } yield {
       droplet
