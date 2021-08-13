@@ -367,6 +367,89 @@ object Droplet
     Listable.listGet[Droplet, responses.Droplets](path ++ Seq(id.toString, "neighbors"))
   }
 
+  def createBatch(
+    names: Seq[String],
+    region: RegionEnum,
+    size: SizeEnum,
+    image: Image,
+    sshKeys: Seq[SshKey],
+    backups: Boolean,
+    ipv6: Boolean,
+    privateNetworking: Boolean,
+    userData: Option[String]
+  )(implicit client: DigitalOceanClient,
+    ec: ExecutionContext
+  ): Future[DropletBatchCreation] = {
+    createBatch(names, region, size, image.id, sshKeys, backups, ipv6, privateNetworking, userData)
+  }
+
+  def createBatch(
+    names: Seq[String],
+    region: RegionEnum,
+    size: SizeEnum,
+    image: BigInt,
+    sshKeys: Seq[SshKey],
+    backups: Boolean,
+    ipv6: Boolean,
+    privateNetworking: Boolean,
+    userData: Option[String]
+  )(implicit client: DigitalOceanClient,
+    ec: ExecutionContext
+  ): Future[DropletBatchCreation] = {
+    val imagePart = "image" -> image
+    createBatchAux(names, region, size, imagePart, sshKeys, backups, ipv6, privateNetworking, userData)
+  }
+
+  def createBatch(
+    names: Seq[String],
+    region: RegionEnum,
+    size: SizeEnum,
+    image: String,
+    sshKeys: Seq[SshKey],
+    backups: Boolean,
+    ipv6: Boolean,
+    privateNetworking: Boolean,
+    userData: Option[String]
+  )(implicit client: DigitalOceanClient,
+    ec: ExecutionContext
+  ): Future[DropletBatchCreation] = {
+    val imagePart = "image" -> image
+    createBatchAux(names, region, size, imagePart, sshKeys, backups, ipv6, privateNetworking, userData)
+  }
+
+  private def createBatchAux(
+    names: Seq[String],
+    region: RegionEnum,
+    size: SizeEnum,
+    imagePart: JValue,
+    sshKeys: Seq[SshKey],
+    backups: Boolean,
+    ipv6: Boolean,
+    privateNetworking: Boolean,
+    userData: Option[String]
+  )(implicit client: DigitalOceanClient,
+    ec: ExecutionContext
+  ): Future[DropletBatchCreation] = {
+    val nonImageParts =
+      ("names" -> names) ~
+        ("region" -> region.slug) ~
+        ("size" -> size.slug) ~
+        ("ssh_keys" -> sshKeys.map(_.id)) ~
+        ("backups" -> backups) ~
+        ("ipv6" -> ipv6) ~
+        ("private_networking" -> privateNetworking) ~
+        ("user_data" -> userData)
+
+    val requestJson = nonImageParts.merge(imagePart)
+
+    for {
+      response <- client.post[responses.DropletBatchCreation](path, requestJson)
+      droplets <- response.toDropletCreation
+    } yield {
+      droplets
+    }
+  }
+
   def create(
     name: String,
     region: RegionEnum,

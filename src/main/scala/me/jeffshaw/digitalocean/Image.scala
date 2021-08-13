@@ -9,7 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class Image(
   id: BigInt,
   name: String,
-  `type`: Image.Type,
+  `type`: String,
   distribution: String,
   slug: Option[String],
   public: Boolean,
@@ -91,37 +91,6 @@ object Image
     } yield {
       response.meta.get.total
     }
-  }
-
-  sealed trait Type
-
-  object Type {
-
-    case object Snapshot extends Type {
-      val StringValue: String = "snapshot"
-    }
-
-    case object Backup extends Type {
-      val StringValue: String = "backup"
-    }
-
-    case object Custom extends Type {
-      val StringValue: String = "custom"
-    }
-
-    private[digitalocean] case object Serializer extends CustomSerializer[Type](format =>
-      (
-        {
-          case JString(Snapshot.StringValue) => Snapshot
-          case JString(Backup.StringValue) => Backup
-          case JString(Custom.StringValue) => Custom
-        },
-        {
-          case tpe: Type =>
-            JString(tpe.toString)
-        }
-      )
-    )
   }
 
   sealed trait ListType {

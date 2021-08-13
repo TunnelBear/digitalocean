@@ -12,7 +12,6 @@ package object digitalocean {
       Inet6AddressSerializer +
       ActionResourceTypeSerializer +
       ActionStatusSerializer +
-      Image.Type.Serializer +
       RegionEnum.Serializer +
       Firewall.Source.Address.Serializer +
       responses.Firewall.Protocol.Serializer +
