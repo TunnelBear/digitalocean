@@ -93,12 +93,12 @@ package object responses {
   //Digital ocean is providing more limited information
   //about a droplet on creation, so just read the id.
   private [digitalocean] case class DropletBatchCreation(
-    droplet: Seq[Id],
+    droplets: Seq[Id],
     links: Links
   ) {
     def toDropletCreation(implicit client: digitalocean.DigitalOceanClient, ec: ExecutionContext): Future[digitalocean.DropletBatchCreation] = {
       val dropletFut = Future.sequence {
-        droplet.map { droplet =>
+        droplets.map { droplet =>
           for {
             droplet <- digitalocean.Droplet(droplet.id)
           } yield {

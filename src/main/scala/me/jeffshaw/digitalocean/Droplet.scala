@@ -444,9 +444,9 @@ object Droplet
 
     for {
       response <- client.post[responses.DropletBatchCreation](path, requestJson)
-      droplet <- response.toDropletCreation
+      droplets <- response.toDropletCreation
     } yield {
-      droplet
+      droplets
     }
   }
 
