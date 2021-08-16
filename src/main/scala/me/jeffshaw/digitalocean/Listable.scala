@@ -8,7 +8,7 @@ trait Listable[T, P <: responses.Page[T]] {
   self: Path =>
 
   def list()(implicit client: DigitalOceanClient, ec: ExecutionContext, mf: Manifest[P]): Future[Iterator[T]] = {
-    Listable.listGet[T, P](path, queryParameters)
+    Listable.listGet[T, P](path, queryParameters ++ Listable.maxPageSizeParameter)
   }
 
   def size()(implicit client: DigitalOceanClient, ec: ExecutionContext, mf: Manifest[P]): Future[BigInt] = {
@@ -22,7 +22,8 @@ trait Listable[T, P <: responses.Page[T]] {
 }
 
 object Listable {
-  val listZeroQueryParameters = Map("per-page" -> Seq("0"))
+  val listZeroQueryParameters = Map("per_page" -> Seq("0"))
+  val maxPageSizeParameter = Map("per_page" -> Seq("200"))
 
   def listGet[
     T,
